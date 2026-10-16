@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Untuk Sasa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff0f3; --bg2:#ffd9e2; --ink:#4a1a2c; --soft:#8a4a5f; --accent:#e0245e; --accent-ink:#fff; --card:#ffffffcc;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#1d0b14; --bg2:#3a1424; --ink:#ffe6ed; --soft:#d9a1b3; --accent:#ff5c8a; --accent-ink:#2a0a16; --card:#2d1220cc; color-scheme:dark;}
+}
+:root[data-theme="dark"]{--bg:#1d0b14; --bg2:#3a1424; --ink:#ffe6ed; --soft:#d9a1b3; --accent:#ff5c8a; --accent-ink:#2a0a16; --card:#2d1220cc; color-scheme:dark;}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*{box-sizing:border-box}
+body{margin:0;height:100%;background:radial-gradient(120% 90% at 50% 0%,var(--bg2),var(--bg) 70%);color:var(--ink);font-family:'Nunito',system-ui,sans-serif;overflow:hidden}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px}
+.card{width:100%;max-width:440px;text-align:center;background:var(--card);backdrop-filter:blur(8px);border-radius:28px;padding:40px 28px;box-shadow:0 20px 60px #e0245e22;min-height:340px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:22px;position:relative;z-index:2}
+h1{font-family:'Caveat',cursive;font-weight:700;font-size:clamp(2.6rem,11vw,3.6rem);line-height:1.05;margin:0}
+p{margin:0;font-size:1.15rem;line-height:1.6;max-width:34ch}
+.soft{color:var(--soft)}
+button{font:inherit;font-weight:800;border:0;border-radius:999px;padding:14px 30px;cursor:pointer;background:var(--accent);color:var(--accent-ink);font-size:1.05rem;transition:transform .15s}
+button:active{transform:scale(.95)}
+button:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+button.ghost{background:transparent;color:var(--soft);border:2px solid var(--soft)}
+.row{display:flex;gap:14px;align-items:center;justify-content:center;flex-wrap:wrap;min-height:56px}
+.heart{font-size:3.2rem;animation:beat 1.2s infinite}
+@keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.2)}30%{transform:scale(1)}45%{transform:scale(1.15)}}
+.line{animation:in .6s both}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.fall{position:fixed;top:-40px;z-index:1;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:.2}}
+.dots{display:flex;gap:6px;justify-content:center}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--soft);opacity:.3}
+.dots i.on{background:var(--accent);opacity:1}
+@media (prefers-reduced-motion:reduce){.heart,.line{animation:none}.fall{display:none}}
+</style>
+</head>
+<body>
+<div id="stage"><div class="card" id="card" aria-live="polite"></div></div>
+<script>
+// === Ubah teks di sini ===
+const NAMA = "Sasa";
+const PENGIRIM = "Aku";
+const PESAN = [
+  "Ada hal yang udah lama pengin aku bilang.",
+  "Setiap ngobrol sama kamu, hariku jadi terasa lebih ringan.",
+  "Aku suka cara kamu ketawa, dan cara kamu peduli sama hal-hal kecil.",
+  "Aku nggak mau cuma jadi teman yang diam-diam senyum liat chat kamu."
+];
+const PERTANYAAN = "Sasa, mau nggak jadi pacarku?";
+const YA = "Mau";
+const TIDAK = "Nanti dulu";
+const BALASAN = "Terima kasih udah bilang mau. Aku janji bikin hari-harimu lebih bahagia.";
+// =========================
+
+const card = document.getElementById('card');
+let step = -1;
+
+function dots(){
+  return '<div class="dots" aria-hidden="true">'+PESAN.map((_,i)=>'<i class="'+(i<=step?'on':'')+'"></i>').join('')+'</div>';
+}
+function intro(){
+  card.innerHTML = '<div class="heart" aria-hidden="true">💌</div><h1>Untuk '+NAMA+'</h1><p class="soft line">Ada surat kecil buat kamu. Buka pelan-pelan ya.</p><div class="row"><button id="go">Buka surat</button></div>';
+  document.getElementById('go').onclick = next;
+}
+function next(){
+  step++;
+  if(step >= PESAN.length) return ask();
+  const last = step === PESAN.length-1;
+  card.innerHTML = '<p class="line" style="font-family:Caveat,cursive;font-size:1.9rem;line-height:1.35;max-width:22ch">'+PESAN[step]+'</p>'+dots()+'<div class="row"><button id="nx">'+(last?'Lanjut':'Terus')+'</button></div>';
+  document.getElementById('nx').onclick = next;
+}
+function ask(){
+  card.innerHTML = '<div class="heart" aria-hidden="true">💗</div><h1>'+PERTANYAAN+'</h1><div class="row" id="btns"><button id="yes">'+YA+'</button><button class="ghost" id="no">'+TIDAK+'</button></div>';
+  const yes = document.getElementById('yes'), no = document.getElementById('no');
+  let tries = 0;
+  const dodge = e => {
+    e.preventDefault();
+    tries++;
+    yes.style.transform = 'scale('+Math.min(1+tries*0.18,2.2)+')';
+    yes.style.margin = (tries*4)+'px';
+    no.style.position = 'fixed';
+    const w = innerWidth-no.offsetWidth-20, h = innerHeight-no.offsetHeight-20;
+    no.style.left = (10+Math.random()*w)+'px';
+    no.style.top = (10+Math.random()*h)+'px';
+    no.style.zIndex = 5;
+    if(tries>=6) no.style.display='none';
+  };
+  no.addEventListener('pointerenter', dodge);
+  no.addEventListener('click', dodge);
+  yes.onclick = celebrate;
+}
+function rain(n){
+  const items = ['💖','🌸','💗','✨','🌷'];
+  for(let i=0;i<n;i++){
+    const s = document.createElement('span');
+    s.className='fall';
+    s.textContent = items[i%items.length];
+    s.style.left = Math.random()*100+'vw';
+    s.style.fontSize = (18+Math.random()*26)+'px';
+    s.style.animationDuration = (3+Math.random()*4)+'s';
+    s.style.animationDelay = (Math.random()*2)+'s';
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(),9500);
+  }
+}
+function celebrate(){
+  card.innerHTML = '<div class="heart" aria-hidden="true">🥹💞</div><h1>Yeay!</h1><p class="line">'+BALASAN+'</p><p class="soft line" style="font-family:Caveat,cursive;font-size:1.8rem">— '+PENGIRIM+'</p>';
+  rain(40);
+  setInterval(()=>rain(14),3500);
+}
+intro();
+</script>
+</body>
+</html>
